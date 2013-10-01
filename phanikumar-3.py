@@ -28,26 +28,27 @@ def processfile(inputfile,outputfile):
 		reader = csv.reader(csvfile,  delimiter=',',  quotechar='|')
 		header = reader.next()
 		header = map(str.strip, header)
-		for x in header[2:] :
-			companies[x] = {'YearMonth' : [],'Value' : 0}
-			
+		i = 2
+		for x in header[i:] :
+			companies[i] = {'Name' : x,'YearMonth' : [],'Value' : 0}
+			i = i + 1
+		
 		for row in reader :
 			i = 2
 			row = map(str.strip, row)
-			if row[i] is not None :
-				for comapny in companies :
-					if companies[comapny]['Value'] < int(row[i]) :
-						companies[comapny]['Value'] = int(row[i])
-						companies[comapny]['YearMonth'] = [row[0]+'-'+row[1]]
-					elif companies[comapny]['Value'] == int(row[i]) :
-						companies[comapny]['YearMonth'].append(row[0]+'-'+row[1])
-					i = i + 1
-		
+			while companies.get(i) is not None :
+				if companies[i]['Value'] < int(row[i]) :
+					companies[i]['Value'] = int(row[i])
+					companies[i]['YearMonth'] = [row[0]+'-'+row[1]]
+				elif companies[i]['Value'] == int(row[i]) :
+					companies[i]['YearMonth'].append(row[0]+'-'+row[1])
+				i = i + 1
+	
 	with open(outputfile, 'wb') as csvfile :
 		writer = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 		writer.writerow(['Company Name', 'Highest Value', 'Year-Month'])
-		for comapny in companies :
-			data = [comapny, companies[comapny]['Value'], ' & '.join(companies[comapny]['YearMonth'])]
+		for i in companies :
+			data = [companies[i]['Name'], companies[i]['Value'], ' & '.join(companies[i]['YearMonth'])]
 			writer.writerow(data)
 
 if __name__ == "__main__" :
